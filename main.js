@@ -1,36 +1,16 @@
-import axios from "axios"
+import { login } from "./services/login.js"
+import env from './env/config.js'
 
-async function getData() {
+async function request(url) {
   try {
-    const response = await axios.get()
+    const { data, api } = await login(env.ISS_PORTAL_EMAIL, env.ISS_PORTAL_PASSWORD)
 
-    return response.data
+    const response = await api.get(url)
+
+    console.log(response.data)
   } catch (err) {
-    console.error(
-      "Erro:",
-      err.response?.status,
-      err.response?.data || err.message
-    )
+    console.error(err)
   }
 }
 
-// const apiResponse = await getData()
-
-// const { current_page, data } = apiResponse.tickets
-// const { agents } = apiResponse
-
-// const dataFiltered = data.map((tck) => {
-//     const { id, tn, title, user_id } = tck
-
-//     return {
-//         id,
-//         ticket_id: tn,
-//         title,
-//         agent: agents[String(user_id)]
-//     }
-// })
-
-// console.log({
-//     current_page,
-//     dataFiltered
-// })
+// request("https://partner.issivs.com/api/ticket/14897/messages")
