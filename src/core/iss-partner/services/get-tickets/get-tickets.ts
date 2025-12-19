@@ -1,6 +1,8 @@
 import { AxiosInstance } from 'axios'
 import qs from 'qs'
 
+import { IssGetTicketsResponseDto } from '../../dto/get-tickets-response.dto'
+
 interface GetTicketsServiceRequest {
     searchField: string | null,
     searchValue: string | null,
@@ -9,12 +11,12 @@ interface GetTicketsServiceRequest {
 }
 
 interface GetTicketsServiceResponse {
-    data: any
+    response: IssGetTicketsResponseDto
 }
 
 export class GetTicketsService {
     constructor(
-        private api: AxiosInstance
+        private apiAuthenticated: AxiosInstance
     ) { }
 
     async execute({
@@ -24,7 +26,7 @@ export class GetTicketsService {
         page
     }: GetTicketsServiceRequest): Promise<GetTicketsServiceResponse> {
         if (perPage && page) {
-            const apiResponse = await this.api.get('/agent/get-tickets', {
+            const apiResponse = await this.apiAuthenticated.get('/agent/get-tickets', {
                 params: {
                     sorting: [
                         {
@@ -37,14 +39,14 @@ export class GetTicketsService {
                         field: (searchValue && searchField) ? searchField : 'tn'
                     },
                     my_tickets: 0,
-                    per_page: 10,
-                    page: 1
+                    per_page: perPage,
+                    page: page
                 },
                 paramsSerializer: params => qs.stringify(params, { encode: false })
             })
 
             return {
-                data: apiResponse.data
+                response: apiResponse.data
             }
         }
 
