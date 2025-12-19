@@ -2,9 +2,9 @@ import 'dotenv/config'
 import z from 'zod'
 
 const envSchema = z.object({
-    PORT: z.coerce.number().default(3000),
-    ISS_PORTAL_EMAIL: z.string().email(),
-    ISS_PORTAL_PASSWORD: z.string()
+    ISS_PORTAL_EMAIL: z.string(),
+    ISS_PORTAL_PASSWORD: z.string(),
+    ISS_PORTAL_URL: z.string()
 })
 
 const _env = envSchema.safeParse(process.env)
