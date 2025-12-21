@@ -5,61 +5,50 @@ import { GetTicketsService } from './core/iss-partner/services/get-tickets/get-t
 
 import env from './infra/env/config'
 import { startHttpServer } from './infra/http/server'
-import { write } from 'node:fs'
+import { TicketPriority, TicketStatus, TicketType } from './core/iss-partner/config/tickets-info'
 
 async function main() {
   try {
-    const { apiAuthenticated } = await new AuthenticateMemberService().execute({
+    const authenticateMemberService = new AuthenticateMemberService()
+
+    const { apiAuthenticated } = await authenticateMemberService.execute({
       email: env.ISS_PORTAL_EMAIL,
       password: env.ISS_PORTAL_PASSWORD,
     })
 
-    const getTicketsService = new GetTicketsService(apiAuthenticated)
 
-    const fetchTicketInfoService = new FetchTicketInfoService(apiAuthenticated)
-
-    const { response } = await getTicketsService.execute({
+    const { tickets } = await new GetTicketsService(apiAuthenticated).execute({
       searchField: null,
       searchValue: null,
-      perPage: 10,
+      perPage: 25,
       page: 1
     })
 
-    const { data } = response.tickets
+    const fetchTicketInfoService = new FetchTicketInfoService(apiAuthenticated)
 
-    const tickets = data.map((tck) => {
+    const tikcetsInfo = await Promise.all(
+      tickets.map(async ticket => await fetchTicketInfoService.execute({ ticketId: ticket.pkId }))
+    )
+
+    const CTickets = tickets.map(ticket => {
+      let customer
+      const info = tikcetsInfo.find(t => t.rawResponse.props.ticketInfo.ticket.id === ticket.pkId)
+
+      if (!info) customer = 'Customer not found'
+      else customer = info.customer
+
       return {
-        pkId: tck.id,
-        ticketId: tck.tn,
-        title: tck.title,
-        status: tck.ticket_state_id,
-        createdAt: tck.create_time,
-        modifiedAt: tck.change_time,
-        type: tck.ticket_type,
-        priority: tck.ticket_priority_id,
-        customerEmail: tck.customer_id,
-        curtomerId: tck.cu_id,
-        agent: response.agents[tck.user_id],
-        agentId: tck.user_id
+        ticket,
+        customer,
       }
     })
 
-    // const ticketsInfos = await Promise.all(
-    //   tickets.map(async (tck) => {
-    //     const r = await fetchTicketInfoService.execute({
-    //       ticketId: tck.pkId
-    //     })
-
-    //     return r.data
-    //   })
-    // )
-
-    console.log(tickets)
+    console.log(CTickets)
   } catch (err) {
     console.error(err)
   }
 }
 
-main()
+// main()
 
-// startHttpServer()
+startHttpServer()

@@ -1,10 +1,8 @@
 import { AxiosInstance } from "axios"
 
-import { InitSessionService } from "./dependences/init-session"
-import { IssPartnerApi } from "./dependences/iss-partner-api"
-import { LoginService } from "./dependences/login"
+import { PortalApi } from "./api/portal-api"
+import { LoginService } from "./login/login"
 
-import env from "@/infra/env/config"
 import { CookieJar } from "tough-cookie"
 
 interface AuthenticateMemberServiceRequest {
@@ -16,26 +14,24 @@ interface AuthenticateMemberServiceResponse {
 }
 
 export class AuthenticateMemberService {
-    constructor(
-        private cookiesManager: CookieJar = new CookieJar()
-    ) { }
+    constructor() { }
 
     async execute({
         email,
         password
-    }: AuthenticateMemberServiceRequest): Promise<AuthenticateMemberServiceResponse> 
-    {
-        const apiInstance = await new IssPartnerApi(this.cookiesManager).create()
-        const sessionService = new InitSessionService(this.cookiesManager, apiInstance)
+    }: AuthenticateMemberServiceRequest): Promise<AuthenticateMemberServiceResponse> {
+        const cookieJar = new CookieJar()
 
-        const { apiWithSession, sessionCookie } = await sessionService.execute({})
+        const apiInstance = await PortalApi.create(cookieJar)
 
-        const loginService = new LoginService(apiWithSession)
+        const loginService = new LoginService(
+            apiInstance,
+            cookieJar
+        )
 
         const { apiAuthenticated } = await loginService.execute({
             email,
             password,
-            sessionCookie,
         })
 
         return {

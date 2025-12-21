@@ -1,9 +1,10 @@
 
+import env from "../env/config";
 import app from "./app";
 
 export function startHttpServer() {
     app.listen({
-        port: 3000,
+        port: env.PORT,
         host: '0.0.0.0'
     }, (err, address) => {
         if (err) {

@@ -1,12 +1,15 @@
 import { AxiosInstance } from "axios"
 import { IssFetchTicketResponseDTO } from "../../dto/fetch-ticket-response.dto"
+import { Customer } from "@/core/model/customer"
+import { CustomerMapper } from "../../mappers/customer-mapper"
 
 interface FetchTicketInfoServiceRequest {
     ticketId: number
 }
 
 interface FetchTicketInfoServiceResponse {
-    data: IssFetchTicketResponseDTO
+    customer: Customer
+    rawResponse: IssFetchTicketResponseDTO
 }
 
 export class FetchTicketInfoService {
@@ -28,8 +31,13 @@ export class FetchTicketInfoService {
             }
         )
 
+        const rawResponse = apiResponse.data as IssFetchTicketResponseDTO
+
+        const customer = CustomerMapper.toEntity(rawResponse.props.ticketInfo.client)
+
         return {
-            data: apiResponse.data
+            customer,
+            rawResponse,
         }
     }
 }

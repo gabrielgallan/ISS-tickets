@@ -1,7 +1,9 @@
-export interface IssGetTicketsResponseDto {
+import { TicketPriority, TicketStatus, TicketType } from "../config/tickets-info"
+
+export interface IssGetTicketsResponseDTO {
     tickets: {
         current_page: number
-        data: IssTicketDto[]
+        data: IssTicketDTO[]
         first_page_url: string
         from: number
         last_page: number
@@ -18,7 +20,7 @@ export interface IssGetTicketsResponseDto {
     projects: any[]
 }
 
-interface IssTicketDto {
+export interface IssTicketDTO {
   id: number
   tn: string
   title: string
@@ -31,8 +33,8 @@ interface IssTicketDto {
 
   user_id: number
   responsible_user_id: number
-  ticket_priority_id: number
-  ticket_state_id: number
+  ticket_priority_id: keyof typeof TicketPriority
+  ticket_state_id: keyof typeof TicketStatus
   cu_id: number
 
   customer_id: string
@@ -56,7 +58,7 @@ interface IssTicketDto {
   change_time: string // ISO datetime
   change_by: number
 
-  ticket_type: string // vem como string na API
+  ticket_type: keyof typeof TicketType
   comment: string | null
   status: string | null
 

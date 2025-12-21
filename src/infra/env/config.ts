@@ -2,9 +2,13 @@ import 'dotenv/config'
 import z from 'zod'
 
 const envSchema = z.object({
+    PORT: z.coerce.number().default(3000),
     ISS_PORTAL_EMAIL: z.string(),
     ISS_PORTAL_PASSWORD: z.string(),
-    ISS_PORTAL_URL: z.string()
+    ISS_PORTAL_URL: z.string().url()
+        .refine((value) => value.startsWith('https://'), {
+            message: 'ISS_PORTAL_URL deve usar HTTPS'
+        })
 })
 
 const _env = envSchema.safeParse(process.env)

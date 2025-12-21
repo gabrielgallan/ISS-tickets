@@ -1,18 +1,25 @@
-import { AxiosInstance } from 'axios'
+import { AxiosError, AxiosInstance } from 'axios'
 import qs from 'qs'
 
-import { IssGetTicketsResponseDto } from '../../dto/get-tickets-response.dto'
+import { IssGetTicketsResponseDTO } from '../../dto/get-tickets-response.dto'
+import { Ticket } from '@/core/model/tickets'
+import { TicketsMapper } from '../../mappers/tickets-mapper'
+import { UnauthorizedMemberError } from '../errors/unauthorized-member'
+import { InternalServerError } from '../errors/internal-server-error'
 
 interface GetTicketsServiceRequest {
-    searchField: string | null,
+    searchField: TicketSearchFields | null,
     searchValue: string | null,
-    perPage: number | null,
-    page: number | null
+    perPage: number,
+    page: number
 }
 
 interface GetTicketsServiceResponse {
-    response: IssGetTicketsResponseDto
+    tickets: Ticket[]
+    rawResponse: IssGetTicketsResponseDTO
 }
+
+type TicketSearchFields = 'tn' | 'title' | 'a_body' | 'company' | 'customer_user_id' | 'login'
 
 export class GetTicketsService {
     constructor(
@@ -25,9 +32,15 @@ export class GetTicketsService {
         perPage,
         page
     }: GetTicketsServiceRequest): Promise<GetTicketsServiceResponse> {
-        if (perPage && page) {
+        try {
             const apiResponse = await this.apiAuthenticated.get('/agent/get-tickets', {
                 params: {
+                    filters: {
+                        ticket_state_id: [],
+                        ticket_priority_id: [],
+                        ticket_type: [],
+
+                    },
                     sorting: [
                         {
                             sort_key: "create_time",
@@ -45,11 +58,20 @@ export class GetTicketsService {
                 paramsSerializer: params => qs.stringify(params, { encode: false })
             })
 
-            return {
-                response: apiResponse.data
-            }
-        }
+            const rawResponse = apiResponse.data as IssGetTicketsResponseDTO
 
-        throw new Error()
+            const tickets = rawResponse.tickets.data.map((ticket) => TicketsMapper.toEntity(ticket, rawResponse))
+
+            return {
+                tickets,
+                rawResponse
+            }
+        } catch (err: any) {
+            if (err instanceof AxiosError) {
+                if (err.response?.status === 409) throw new UnauthorizedMemberError()
+            }
+
+            throw new InternalServerError(err.message)
+        }
     }
 }
