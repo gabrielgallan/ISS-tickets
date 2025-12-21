@@ -10,23 +10,24 @@ interface AuthenticateMemberServiceRequest {
     password: string
 }
 interface AuthenticateMemberServiceResponse {
-    apiAuthenticated: AxiosInstance
+    apiAuthenticated: AxiosInstance,
+    cookieJar: CookieJar
 }
 
 export class AuthenticateMemberService {
-    constructor() { }
+    constructor(
+        private cookieJar: CookieJar
+    ) { }
 
     async execute({
         email,
         password
     }: AuthenticateMemberServiceRequest): Promise<AuthenticateMemberServiceResponse> {
-        const cookieJar = new CookieJar()
-
-        const apiInstance = await PortalApi.create(cookieJar)
+        const apiInstance = await PortalApi.create(this.cookieJar)
 
         const loginService = new LoginService(
             apiInstance,
-            cookieJar
+            this.cookieJar
         )
 
         const { apiAuthenticated } = await loginService.execute({
@@ -36,6 +37,7 @@ export class AuthenticateMemberService {
 
         return {
             apiAuthenticated,
+            cookieJar: this.cookieJar
         }
     }
 }

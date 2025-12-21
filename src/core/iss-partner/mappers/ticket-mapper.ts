@@ -1,4 +1,4 @@
-import { Ticket } from "@/core/model/tickets";
+import { Ticket } from "@/core/model/ticket";
 import { IssGetTicketsResponseDTO, IssTicketDTO } from "../dto/get-tickets-response.dto";
 import { TicketPriority, TicketStatus, TicketType } from "../config/tickets-info";
 
@@ -15,9 +15,7 @@ export class TicketsMapper {
             TicketType[rawTicket.ticket_type],
             TicketStatus[rawTicket.ticket_state_id],
             rawTicket.create_time,
-            new Date(rawTicket.create_time).toLocaleString('pt-BR'),
             rawTicket.change_time,
-            new Date(rawTicket.change_time).toLocaleString('pt-BR'),
             rawResponse.agents[rawTicket.user_id],
             rawTicket.user_id
         )

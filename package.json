@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node dist/main.cjs",
-    "dev": "npx tsx --watch src/main.ts",
+    "dev": "npx tsx src/main.ts",
     "build": "tsup"
   },
   "dependencies": {

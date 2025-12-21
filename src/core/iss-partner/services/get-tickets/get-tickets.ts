@@ -2,8 +2,8 @@ import { AxiosError, AxiosInstance } from 'axios'
 import qs from 'qs'
 
 import { IssGetTicketsResponseDTO } from '../../dto/get-tickets-response.dto'
-import { Ticket } from '@/core/model/tickets'
-import { TicketsMapper } from '../../mappers/tickets-mapper'
+import { Ticket } from '@/core/model/ticket'
+import { TicketsMapper } from '../../mappers/ticket-mapper'
 import { UnauthorizedMemberError } from '../errors/unauthorized-member'
 import { InternalServerError } from '../errors/internal-server-error'
 
