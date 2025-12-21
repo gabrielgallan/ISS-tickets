@@ -8,9 +8,10 @@ import { UnauthorizedMemberError } from '../errors/unauthorized-member'
 import { InternalServerError } from '../errors/internal-server-error'
 
 interface GetTicketsServiceRequest {
-    searchField: TicketSearchFields | null,
-    searchValue: string | null,
-    perPage: number,
+    searchField: TicketSearchFields
+    searchValue: string
+    filters: TicketFilters
+    perPage: number
     page: number
 }
 
@@ -21,6 +22,12 @@ interface GetTicketsServiceResponse {
 
 type TicketSearchFields = 'tn' | 'title' | 'a_body' | 'company' | 'customer_user_id' | 'login'
 
+interface TicketFilters {
+    ticketStateIds: number[]
+    ticketPriorityIds: number[]
+    ticketTypeIds: number[]
+}
+
 export class GetTicketsService {
     constructor(
         private apiAuthenticated: AxiosInstance
@@ -29,18 +36,22 @@ export class GetTicketsService {
     async execute({
         searchField,
         searchValue,
+        filters,
         perPage,
         page
     }: GetTicketsServiceRequest): Promise<GetTicketsServiceResponse> {
         try {
+
+            const paramsFilters = {
+                ticket_state_id: filters.ticketStateIds,
+                ticket_priority_id: filters.ticketPriorityIds,
+                ticket_type: filters.ticketTypeIds,
+
+            }
+
             const apiResponse = await this.apiAuthenticated.get('/agent/get-tickets', {
                 params: {
-                    filters: {
-                        ticket_state_id: [],
-                        ticket_priority_id: [],
-                        ticket_type: [],
-
-                    },
+                    filters: paramsFilters,
                     sorting: [
                         {
                             sort_key: "create_time",
@@ -48,7 +59,7 @@ export class GetTicketsService {
                         }
                     ],
                     search: {
-                        value: (searchValue && searchField) ? searchValue : '',
+                        value: (searchValue && searchField) ? encodeURIComponent(searchValue) : '',
                         field: (searchValue && searchField) ? searchField : 'tn'
                     },
                     my_tickets: 0,
