@@ -1,0 +1,84 @@
+.card {
+    height: 250px;
+    width: 250px;
+    padding: 1.9rem 1.2rem;
+    text-align: center;
+    background: #ffffff;
+    border-radius: 5px;
+
+    box-shadow: 0 8px 24px 0 rgba(163, 165, 168, 0.385);
+}
+
+/*Inputs*/
+.field {
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    background-color: #efefef;
+    border-radius: 4px;
+    padding: 0.5em 1em;
+}
+
+.input-icon {
+    height: 1em;
+    width: 1em;
+    fill: #3c50e9;
+}
+
+.input-field {
+    background: none;
+    border: none;
+    outline: none;
+    width: 100%;
+    color: #161616;
+}
+
+/*Text*/
+.title {
+    margin-bottom: 1rem;
+    font-size: 1.5em;
+    font-weight: 500;
+    color: #191919;
+}
+
+/*Buttons*/
+.btn {
+    cursor: pointer;
+    margin-top: 1rem;
+    border: none;
+    border-radius: 3px;
+    font-weight: bold;
+    font-size: 0.8em;
+    text-transform: uppercase;
+    background-color: #3c50e9;
+    width: 100%;
+    padding: 0.8em 0;
+    color: #ffffff;
+    box-shadow: 0 8px 24px 0 rgba(76, 140, 225, 0.519);
+    transition: all 0.3s ease-in-out;
+}
+
+.btn-link {
+    color: #efefef;
+    display: block;
+    font-size: 0.75em;
+    transition: color 0.3s ease-out;
+}
+
+/*Hover & focus*/
+.field input:focus::placeholder {
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.btn:hover {
+    background-color: #5e6681;
+    color: #f2f2f2;
+    box-shadow: 0 8px 24px 0 rgb(16 39 112 / 20%);
+}
+
+.btn-link:hover {
+    color: #f2f2f2;
+}
