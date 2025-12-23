@@ -1,16 +1,18 @@
 import './App.css'
-import LoginForm from './components/LoginForm/LoginForm'
-import Loader from './components/Loader/Loader'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
+
+import PageRouter from './pages/PageRouter'
+import Loader from './components/Loader/Loader'
 import Tickets from './pages/Tickets/Tickets'
-import RootPage from './pages/RootPage/RootPage'
+import LoginForm from './components/LoginForm/LoginForm'
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<RootPage />} />
+        <Route path="/" element={<PageRouter />} />
         <Route path="/tickets" element={<Tickets />} />
+        <Route path="/login" element={<LoginForm />} />
       </Routes>
     </BrowserRouter>
   )

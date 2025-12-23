@@ -4,7 +4,6 @@ import z from 'zod'
 const envSchema = z.object({
     PORT: z.coerce.number().default(3000),
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-    FRONTEND_DEV_URL: z.string().default('http://localhost:5173'),
     ISS_PORTAL_URL: z.string().url()
         .refine((value) => value.startsWith('https://'), {
             message: 'ISS_PORTAL_URL deve usar HTTPS'

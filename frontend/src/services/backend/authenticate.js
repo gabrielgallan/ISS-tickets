@@ -1,3 +1,4 @@
+import { AxiosError } from "axios"
 import { BackendApi } from "../api"
 
 export async function authenticate({ email, password }) {
@@ -9,8 +10,14 @@ export async function authenticate({ email, password }) {
             password
         })
 
-        return { status: true, response }
+        if (response.status !== 201) throw new Error('Internal server error')
     } catch (err) {
-        return { status: false, error: err.message }
+        if (err instanceof AxiosError) {
+            if (err.response) {
+                if (err.response.status === 422) throw new Error('Invalid credentials')
+            }
+        }
+
+        throw new Error('Internal server error')
     }
 }

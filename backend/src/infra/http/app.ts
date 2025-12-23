@@ -16,7 +16,10 @@ const __dirname = path.dirname(__filename);
 
 app.register(fastifyCors, {
   origin: [
-    env.FRONTEND_DEV_URL
+    `http://127.0.0.1:${env.PORT}`,
+    `http://localhost:${env.PORT}`,
+    'http://127.0.0.1:5173',
+    'http://localhost:5173',
   ],
   methods: ['GET', 'POST'],
   credentials: true
