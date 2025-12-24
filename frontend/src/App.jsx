@@ -8,13 +8,13 @@ import LoginForm from './components/LoginForm/LoginForm'
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<PageRouter />} />
-        <Route path="/tickets" element={<Tickets />} />
-        <Route path="/login" element={<LoginForm />} />
-      </Routes>
-    </BrowserRouter>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<PageRouter />} />
+          <Route path="/tickets" element={<Tickets />} />
+          <Route path="/login" element={<LoginForm />} />
+        </Routes>
+      </BrowserRouter>
   )
 }
 

@@ -2,7 +2,10 @@ import { CookieJar } from "tough-cookie";
 import NodeCache from "node-cache";
 import { randomUUID } from "node:crypto";
 
-const cache = new NodeCache({ stdTTL: 7200 })
+const cache = new NodeCache({ 
+    stdTTL: 7200,
+    checkperiod: 120
+})
 
 interface Session {
     sessionId: string,
@@ -10,7 +13,7 @@ interface Session {
 }
 
 export class SessionManager {
-    static createSession() {
+    static createSession(): Session {
         const session = {
             sessionId: randomUUID(),
             sessionCookieJar: new CookieJar()
@@ -19,7 +22,7 @@ export class SessionManager {
         return session
     }
 
-    static saveSession({ sessionId, sessionCookieJar }: Session) {
+    static saveSession({ sessionId, sessionCookieJar }: Session): void {
         cache.set(`${sessionId}`, sessionCookieJar)
     }
 
@@ -35,5 +38,13 @@ export class SessionManager {
             sessionId,
             sessionCookieJar
         }
+    }
+
+    static refreshSession(sessionId: string): void {
+        const sessionCookieJar = cache.get(sessionId) as CookieJar
+
+        if (!sessionCookieJar) return
+
+        cache.ttl(sessionId, 7200)
     }
 }

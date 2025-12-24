@@ -1,7 +1,15 @@
 import { AxiosError } from "axios"
 import { BackendApi } from "../api"
 
-export async function authenticate({ email, password }) {
+interface AuthenticateServiceRequest {
+    email: string,
+    password: string
+}
+
+export async function AuthenticateService({ 
+    email, 
+    password
+}: AuthenticateServiceRequest): Promise<void> {
     try {
         const api = BackendApi.create()
 

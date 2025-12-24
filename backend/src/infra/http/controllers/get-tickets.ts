@@ -1,11 +1,12 @@
 import { PortalApi } from "@/core/iss-partner/services/authenticate/api/portal-api";
 import { UnauthorizedMemberError } from "@/core/iss-partner/services/errors/unauthorized-member";
-import { FetchTicketInfoService } from "@/core/iss-partner/services/fetch-ticket-info/fetch-ticket-info";
+import { GetTicketCustomerService } from "@/core/iss-partner/services/get-tickets-customers.ts/get-tickets-customers";
 import { GetTicketsService } from "@/core/iss-partner/services/get-tickets/get-tickets";
 import { SessionManager } from "@/infra/session/session-manager";
 import env from "@/infra/env/config";
 import { FastifyReply, FastifyRequest } from "fastify";
 import z from "zod";
+import { mergeTicketsToCustomers } from "@/core/iss-partner/utils/merge-tickets-customers";
 
 export async function getTickets(request: FastifyRequest, reply: FastifyReply) {
     try {
@@ -62,26 +63,18 @@ export async function getTickets(request: FastifyRequest, reply: FastifyReply) {
             page
         })
 
-        // const fetchTicketInfoService = new FetchTicketInfoService(apiAuthenticated)
+        const getTicketCustomerService = new GetTicketCustomerService(apiAuthenticated)
 
-        // const tikcetsInfo = await Promise.all(
-        //     tickets.map(async ticket => await fetchTicketInfoService.execute({ ticketId: ticket.pkId }))
-        // )
+        const getTicketsCustomersResponse = await Promise.all(
+            tickets.map(async ticket => await getTicketCustomerService.execute({ ticket }))
+        )
 
-        // const CTickets = tickets.map(ticket => {
-        //     let customer
-        //     const info = tikcetsInfo.find(t => t.rawResponse.props.ticketInfo.ticket.id === ticket.pkId)
+        const { mergedTickets } = mergeTicketsToCustomers({
+            tickets,
+            getTicketsCustomersResponse
+        })
 
-        //     if (!info) customer = 'Customer not found'
-        //     else customer = info.customer
-
-        //     return {
-        //         ticket,
-        //         customer,
-        //     }
-        // })
-
-        return reply.status(200).send({ tickets })
+        return reply.status(200).send({ tickets: mergedTickets })
     } catch (err: any) {
         if (err instanceof UnauthorizedMemberError) {
             return reply.status(401).send({ error: err.message })

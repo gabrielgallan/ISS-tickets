@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react';
 import './LoginForm.css'
-import { authenticate } from '../../services/backend/authenticate';
+import { AuthenticateService } from '../../services/backend/authenticate';
 import { useNavigate } from 'react-router-dom';
+import Loader from '../Loader/Loader';
+import { useLoading } from '../../hooks/useLoading';
 
 export default function LoginForm() {
   const navigate = useNavigate()
+  const { loading, start, stop } = useLoading()
+
   const [email, setEmail] = useState("")
   const [pass, setPass] = useState("")
+  const [error, setError] = useState()
 
   useEffect(() => {
     document.title = "ISS | Login"
@@ -14,20 +19,25 @@ export default function LoginForm() {
 
   async function handleSubmit(e) {
     e.preventDefault()
+    start()
 
     try {
       document.querySelector('p.errorMessage').innerText = ''
 
-      await authenticate({
+      await AuthenticateService({
         email,
         password: pass
       })
 
       navigate('/tickets')
     } catch (error) {
-      document.querySelector('p.errorMessage').innerText = error.message
+      setError(error.message)
+    } finally {
+      stop()
     }
   }
+
+  if (loading) return <Loader />
 
   return (
     <div>
@@ -65,7 +75,7 @@ export default function LoginForm() {
             />
           </div>
           <button type="submit" className="btn">Login</button>
-          <p className="errorMessage"></p>
+          <p className="errorMessage">{error}</p>
         </form>
       </div>
     </div>

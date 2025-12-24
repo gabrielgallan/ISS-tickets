@@ -7,9 +7,13 @@ export async function refresh(request: FastifyRequest, reply: FastifyReply) {
 
     const { sessionCookieJar } = SessionManager.getSession(sessionId)
 
+    console.log(sessionCookieJar.serializeSync())
+
     const api = await PortalApi.create(sessionCookieJar)
 
-    await api.get('/refresh')
+    await api.get('/')
+
+    console.log(sessionCookieJar.serializeSync())
 
     SessionManager.saveSession({
         sessionId,

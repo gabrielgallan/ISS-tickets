@@ -1,16 +1,20 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Loader from "../components/Loader/Loader";
-import { getTickets } from "../services/backend/get-tickets";
+import { GetTicketsService } from "../services/backend/get-tickets";
+import { useLoading } from "../hooks/useLoading";
 
 export default function PageRouter() {
   const navigate = useNavigate()
-  const [checking, setChecking] = useState(true)
+  const { loading, start, stop } = useLoading()
 
+  
   useEffect(() => {
+    start()
+    
     async function validate() {
       try {
-        const res = await getTickets({
+        const res = await GetTicketsService({
             perPage: 1,
             page: 1
         })
@@ -19,14 +23,14 @@ export default function PageRouter() {
       } catch {
         navigate('/login')
       } finally {
-        setChecking(false)
+        stop()
       }
     }
 
     validate()
   }, [])
 
-  if (checking) return <Loader />
+  if (loading) return <Loader />
 
   return null
 }

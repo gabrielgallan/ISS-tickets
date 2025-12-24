@@ -2,25 +2,27 @@ import { AxiosInstance } from "axios"
 import { IssFetchTicketResponseDTO } from "../../dto/fetch-ticket-response.dto"
 import { Customer } from "@/core/model/customer"
 import { CustomerMapper } from "../../mappers/customer-mapper"
+import { Ticket } from "@/core/model/ticket"
 
-interface FetchTicketInfoServiceRequest {
-    ticketId: number
+interface GetTicketCustomerServiceRequest {
+    ticket: Ticket
 }
 
-interface FetchTicketInfoServiceResponse {
+export interface GetTicketCustomerServiceResponse {
+    ticketPkId: number
     customer: Customer
     rawResponse: IssFetchTicketResponseDTO
 }
 
-export class FetchTicketInfoService {
+export class GetTicketCustomerService {
     constructor(
         private apiAuthenticated: AxiosInstance
     ) { }
 
     async execute({
-        ticketId
-    }: FetchTicketInfoServiceRequest): Promise<FetchTicketInfoServiceResponse> {
-        const apiResponse = await this.apiAuthenticated.get(`/en/agent/ticket/${ticketId}`,
+        ticket
+    }: GetTicketCustomerServiceRequest): Promise<GetTicketCustomerServiceResponse> {
+        const apiResponse = await this.apiAuthenticated.get(`/en/agent/ticket/${ticket.pkId}`,
             {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
@@ -36,6 +38,7 @@ export class FetchTicketInfoService {
         const customer = CustomerMapper.toEntity(rawResponse.props.ticketInfo.client)
 
         return {
+            ticketPkId: ticket.pkId,
             customer,
             rawResponse,
         }

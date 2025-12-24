@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getTickets } from "../services/backend/get-tickets";
+import { GetTicketsService } from "../services/backend/get-tickets";
 
 export function useCheckAuth() {
   const navigate = useNavigate()
-  const [checking, setChecking] = useState(true)
+  // const [checking, setChecking] = useState(true)
 
   useEffect(() => {
     async function run() {
         try {
-            const res = await getTickets({
+            const res = await GetTicketsService({
               perPage: 1,
               page: 1
             })

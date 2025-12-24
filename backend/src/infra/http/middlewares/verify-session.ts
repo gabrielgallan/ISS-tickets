@@ -6,5 +6,5 @@ export async function verifySession(
 ) {
     const { sessionId } = request.cookies
 
-    if (!sessionId) return reply.status(422).send({ error: 'Session not initializaed' })
+    if (!sessionId) return reply.status(401).send({ error: 'Session not initializaed' })
 }

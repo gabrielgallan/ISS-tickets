@@ -1,0 +1,13 @@
+{
+  "name": "tickets",
+  "version": "1.0.0",
+  "description": "",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "build": "npm run build --ws",
+    "start": "npm -w backend run start"
+  }
+}

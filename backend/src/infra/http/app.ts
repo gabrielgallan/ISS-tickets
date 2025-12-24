@@ -32,8 +32,12 @@ app.register(fastifyStatic, {
 
 app.register(fastifyCookie)
 
-app.get('/', (request, reply) => {
-  reply.sendFile('index.html')
+app.setNotFoundHandler((req, reply) => {
+  if (req.url.startsWith('/api')) {
+    return reply.code(404).send({ message: 'Not Found' })
+  }
+
+  return reply.sendFile('index.html')
 })
 
 app.register(ticketsRoutes, {
