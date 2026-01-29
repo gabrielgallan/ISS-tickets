@@ -39,16 +39,37 @@ export async function authenticate(request: FastifyRequest, reply: FastifyReply)
                 path: "/"
             })
             .status(201)
-            .send({ status: 'Authenticated' })
+            .send({
+                success: true,
+                data: {}
+            })
     } catch (err: any) {
         if (err instanceof InvalidCredentialsError) {
-            return reply.status(422).send({ error: err.message })
+            return reply.status(422).send({
+                success: false,
+                error: {
+                    code: 'INVALID_CREDENTIALS',
+                    message: err.message
+                }
+            })
         }
         if (err instanceof InvalidPortalUrlError) {
-            return reply.status(500).send({ error: err.message })
+            return reply.status(500).send({
+                success: false,
+                error: {
+                    code: 'INVALID_PORTAL_URL',
+                    message: err.message
+                }
+            })
         }
         if (err instanceof InternalServerError) {
-            return reply.status(500).send({ error: err.message })
+            return reply.status(500).send({
+                success: false,
+                error: {
+                    code: 'INTERNAL_SERVER_ERROR',
+                    message: err.message
+                }
+            })
         }
 
         throw err

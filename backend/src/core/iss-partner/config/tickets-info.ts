@@ -1,6 +1,7 @@
 export const TicketStatus = {
     3: 'Closed',
     4: 'Open',
+    1: 'Open',
     6: 'Resolved',
     8: 'On Customer',
     10: 'On Escalation',

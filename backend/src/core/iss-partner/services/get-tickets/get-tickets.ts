@@ -71,6 +71,8 @@ export class GetTicketsService {
 
             const rawResponse = apiResponse.data as IssGetTicketsResponseDTO
 
+            console.log(rawResponse.tickets.data)
+
             const tickets = rawResponse.tickets.data.map((ticket) => TicketsMapper.toEntity(ticket, rawResponse))
 
             return {

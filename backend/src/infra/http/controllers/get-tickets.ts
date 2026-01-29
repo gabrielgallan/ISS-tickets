@@ -74,10 +74,19 @@ export async function getTickets(request: FastifyRequest, reply: FastifyReply) {
             getTicketsCustomersResponse
         })
 
-        return reply.status(200).send({ tickets: mergedTickets })
+        return reply.status(200).send({
+            success: true,
+            data: { tickets: mergedTickets }
+        })
     } catch (err: any) {
         if (err instanceof UnauthorizedMemberError) {
-            return reply.status(401).send({ error: err.message })
+            return reply.status(401).send({
+                success: false,
+                error: {
+                    code: 'UNAUTHORIZED_MEMBER',
+                    message: err.message
+                }
+            })
         }
 
         throw err

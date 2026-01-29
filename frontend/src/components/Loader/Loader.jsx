@@ -1,92 +1,47 @@
-import React from 'react';
-import styled from 'styled-components';
+import React from "react";
+import styled from "styled-components";
 
 const Loader = () => {
   return (
     <StyledWrapper>
-      <div className="loader">
-        <div className="square" id="sq1" />
-        <div className="square" id="sq2" />
-        <div className="square" id="sq3" />
-        <div className="square" id="sq4" />
-        <div className="square" id="sq5" />
-        <div className="square" id="sq6" />
-        <div className="square" id="sq7" />
-        <div className="square" id="sq8" />
-        <div className="square" id="sq9" />
-      </div>
+      <div className="spinner" />
     </StyledWrapper>
   );
-}
+};
 
 const StyledWrapper = styled.div`
-  @keyframes loader_5191 {
-    from {
-      opacity: 0;
+  display: grid;
+  place-items: center;
+  min-height: 120px;
+
+  .spinner {
+    width: 46px;
+    height: 46px;
+    display: grid;
+    animation: spinner-plncf9 3s infinite;
+  }
+
+  .spinner::before,
+  .spinner::after {
+    content: "";
+    grid-area: 1/1;
+    border: 9px solid;
+    border-radius: 50%;
+    border-color: #2b6ee8 #2b6ee8 transparent transparent;
+    mix-blend-mode: darken;
+    animation: spinner-plncf9 1s infinite linear;
+  }
+
+  .spinner::after {
+    border-color: transparent transparent #c7d6f8 #c7d6f8;
+    animation-direction: reverse;
+  }
+
+  @keyframes spinner-plncf9 {
+    100% {
+      transform: rotate(1turn);
     }
-
-    to {
-      opacity: 1;
-    }
   }
-
-  .square {
-    background: #1571e2ff;
-    width: 10px;
-    height: 10px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    margin-top: -5px;
-    margin-left: -5px;
-  }
-
-  #sq1 {
-    margin-top: -25px;
-    margin-left: -25px;
-    animation: loader_5191 675ms ease-in-out 0s infinite alternate;
-  }
-
-  #sq2 {
-    margin-top: -25px;
-    animation: loader_5191 675ms ease-in-out 75ms infinite alternate;
-  }
-
-  #sq3 {
-    margin-top: -25px;
-    margin-left: 15px;
-    animation: loader_5191 675ms ease-in-out 150ms infinite;
-  }
-
-  #sq4 {
-    margin-left: -25px;
-    animation: loader_5191 675ms ease-in-out 225ms infinite;
-  }
-
-  #sq5 {
-    animation: loader_5191 675ms ease-in-out 300ms infinite;
-  }
-
-  #sq6 {
-    margin-left: 15px;
-    animation: loader_5191 675ms ease-in-out 375ms infinite;
-  }
-
-  #sq7 {
-    margin-top: 15px;
-    margin-left: -25px;
-    animation: loader_5191 675ms ease-in-out 450ms infinite;
-  }
-
-  #sq8 {
-    margin-top: 15px;
-    animation: loader_5191 675ms ease-in-out 525ms infinite;
-  }
-
-  #sq9 {
-    margin-top: 15px;
-    margin-left: 15px;
-    animation: loader_5191 675ms ease-in-out 600ms infinite;
-  }`;
+`;
 
 export default Loader;

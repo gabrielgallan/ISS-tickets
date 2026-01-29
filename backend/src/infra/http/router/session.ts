@@ -5,5 +5,5 @@ import { verifySession } from "../middlewares/verify-session";
 
 export async function sessionRoutes(app: FastifyInstance) {
     app.post('/session', authenticate)
-    app.get('/session/refresh', { onRequest: [verifySession] }, refresh)
+    // app.patch('/session/refresh', { onRequest: [verifySession] }, refresh)
 }

@@ -14,16 +14,16 @@ const app = fastify()
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.register(fastifyCors, {
-  origin: [
-    `http://127.0.0.1:${env.PORT}`,
-    `http://localhost:${env.PORT}`,
-    'http://127.0.0.1:5173',
-    'http://localhost:5173',
-  ],
-  methods: ['GET', 'POST'],
-  credentials: true
-})
+// app.register(fastifyCors, {
+//   origin: [
+//     `http://127.0.0.1:${env.PORT}`,
+//     `http://localhost:${env.PORT}`,
+//     'http://127.0.0.1:5173',
+//     'http://localhost:5173',
+//   ],
+//   methods: ['GET', 'POST'],
+//   credentials: true
+// })
 
 app.register(fastifyStatic, {
   root: path.join(__dirname, "../../frontend/dist"),
@@ -40,11 +40,10 @@ app.setNotFoundHandler((req, reply) => {
   return reply.sendFile('index.html')
 })
 
-app.register(ticketsRoutes, {
-  prefix: 'api'
-})
-
-app.register(sessionRoutes, {
+app.register(async () => {
+  app.register(sessionRoutes)
+  app.register(ticketsRoutes)
+}, {
   prefix: 'api'
 })
 

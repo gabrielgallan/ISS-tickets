@@ -1,15 +1,403 @@
 .tickets-page {
-    height: 90%;
-    width: 90%;
-    border: 2px solid rgb(117, 117, 117);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    height: 100%;
+    min-height: 0;
 }
 
-.page-title {
-    margin: 0;
-    margin-left: 5%;
+.tickets-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
 
-    font-family: "Share Tech", sans-serif;
-    font-size: 2.5em;
-    font-weight: bold;
-    color: rgb(21, 21, 21);
+.tickets-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+}
+
+.tickets-subtitle {
+    margin: 6px 0 0;
+    color: #64748b;
+    font-size: 0.95rem;
+}
+
+.tickets-filters {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+    overflow: hidden;
+}
+
+.filters-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border: none;
+    background: #ffffff;
+    color: #94a3b8;
+    font-weight: 700;
+    cursor: pointer;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.filters-toggle__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: inherit;
+}
+
+.filters-toggle__label {
+    font-size: 0.95rem;
+}
+
+.filters-toggle__chevron {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: inherit;
+    transition: transform 200ms ease;
+}
+
+.tickets-filters[data-collapsed="true"] .filters-toggle__chevron {
+    transform: rotate(180deg);
+}
+
+.filters-body {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    transition: max-height 220ms ease, opacity 200ms ease, transform 200ms ease;
+    max-height: 900px;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.tickets-filters[data-collapsed="true"] .filters-body {
+    max-height: 0;
+    opacity: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+}
+
+.tickets-filters[data-has-filters="true"] .filters-toggle {
+    color: #2b6ee8;
+}
+
+.filters-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.filters-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #334155;
+    font-weight: 600;
+}
+
+.filters-field input,
+.filters-field select {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    background: #ffffff;
+    color: #0f172a;
+}
+
+.filters-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: #334155;
+    font-weight: 600;
+}
+
+.filters-options {
+    display: grid;
+    gap: 8px;
+}
+
+.filters-options--single {
+    grid-template-columns: 1fr;
+}
+
+.filters-options--double {
+    grid-template-columns: repeat(2, minmax(140px, 1fr));
+}
+
+.filters-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.checkbox-wrapper-4 * {
+    box-sizing: border-box;
+    color: #0f172a;
+}
+
+.checkbox-item {
+    position: relative;
+}
+
+.checkbox-wrapper-4 .cbx {
+    user-select: none;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 6px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #475569;
+    font-weight: 500;
+    width: 100%;
+}
+
+.checkbox-wrapper-4 .cbx:hover {
+    background: rgba(43, 110, 232, 0.08);
+}
+
+.checkbox-wrapper-4 .cbx span {
+    display: inline-flex;
+    align-items: center;
+    transform: translate3d(0, 0, 0);
+}
+
+.checkbox-wrapper-4 .cbx span:first-child {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    transform: scale(1);
+    border: 1px solid #cbd5f5;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 1px rgba(0, 16, 75, 0.05);
+    background: #ffffff;
+}
+
+.checkbox-wrapper-4 .cbx span:first-child svg {
+    position: absolute;
+    top: 3px;
+    left: 2px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 16px;
+    stroke-dashoffset: 16px;
+    transition: all 0.3s ease;
+    transition-delay: 0.1s;
+    transform: translate3d(0, 0, 0);
+}
+
+.checkbox-wrapper-4 .cbx span:last-child {
+    line-height: 18px;
+}
+
+.checkbox-wrapper-4 .cbx:hover span:first-child {
+    border-color: #2b6ee8;
+}
+
+.checkbox-wrapper-4 .inp-cbx {
+    position: absolute;
+    visibility: hidden;
+}
+
+.checkbox-wrapper-4 .inp-cbx:checked + .cbx span:first-child {
+    background: #2b6ee8;
+    border-color: #2b6ee8;
+    animation: wave-4 0.4s ease;
+}
+
+.checkbox-wrapper-4 .inp-cbx:checked + .cbx span:first-child svg {
+    stroke-dashoffset: 0;
+}
+
+.checkbox-wrapper-4 .inline-svg {
+    position: absolute;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    user-select: none;
+}
+
+@keyframes wave-4 {
+    50% {
+        transform: scale(0.9);
+    }
+}
+
+.tickets-state {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+}
+
+.tickets-state__title {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.tickets-state__message {
+    color: #64748b;
+    font-size: 0.95rem;
+}
+
+.tickets-state--error {
+    border-color: rgba(239, 68, 68, 0.25);
+}
+
+.btn-primary {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #2b6ee8;
+    color: #ffffff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 120ms ease, background 120ms ease;
+}
+
+.btn-primary:hover {
+    background: #1f5fbf;
+}
+
+.tickets-pagination {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.tickets-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+    min-height: 0;
+}
+
+.tickets-list-wrapper {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+}
+
+.pagination-controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.pagination-controls button {
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    color: #334155;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.pagination-controls button.is-active {
+    background: #2b6ee8;
+    color: #ffffff;
+    border-color: #2b6ee8;
+}
+
+.pagination-controls button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-size {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.pagination-size input {
+    width: 90px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 0.9rem;
+    font-family: inherit;
+}
+
+.pagination-settings {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pagination-apply {
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    color: #2b6ee8;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pagination-apply:hover {
+    background: #e9f0ff;
+    border-color: rgba(43, 110, 232, 0.3);
+}
+
+.btn-secondary {
+    padding: 10px 16px;
+    border-radius: 8px;
+    background: #f1f5f9;
+    color: #1e293b;
+    font-weight: 600;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+    transition: background 120ms ease, transform 120ms ease;
+}
+
+.btn-secondary:hover {
+    background: #e2e8f0;
 }
