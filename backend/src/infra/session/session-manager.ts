@@ -12,7 +12,7 @@ interface Session {
     sessionCookieJar: CookieJar
 }
 
-export class SessionManager {
+export class TestSessionManager {
     static createSession(): Session {
         const session = {
             sessionId: randomUUID(),

@@ -8,6 +8,8 @@ interface GetTicketsServiceRequest {
     ticketStateIds?: number[]
     ticketPriorityIds?: number[]
     ticketTypeIds?: number[]
+    startDate?: string
+    endDate?: string
 }
 
 interface GetTicketsServiceResponse {
@@ -22,7 +24,9 @@ export async function GetTicketsService({
     searchValue,
     ticketStateIds,
     ticketPriorityIds,
-    ticketTypeIds
+    ticketTypeIds,
+    startDate,
+    endDate
 }: GetTicketsServiceRequest): Promise<GetTicketsServiceResponse> {
     try {
         const api = BackendApi.create()
@@ -44,6 +48,11 @@ export async function GetTicketsService({
 
         if (ticketTypeIds && ticketTypeIds.length > 0) {
             params.ticketTypeIds = ticketTypeIds.join(',')
+        }
+
+        if (startDate && endDate) {
+            params.startDate = startDate
+            params.endDate = endDate
         }
 
         const response = await api.get('/tickets', {

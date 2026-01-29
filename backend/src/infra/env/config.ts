@@ -7,7 +7,10 @@ const envSchema = z.object({
     ISS_PORTAL_URL: z.string().url()
         .refine((value) => value.startsWith('https://'), {
             message: 'ISS_PORTAL_URL deve usar HTTPS'
-        })
+        }),
+    CRYPTO_KEY: z.string(),
+    JWT_SECRET: z.string(),
+    REDIS_URL: z.string().url()
 })
 
 const _env = envSchema.safeParse(process.env)

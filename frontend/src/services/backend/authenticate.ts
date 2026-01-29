@@ -1,4 +1,4 @@
-import { ApiError, BackendApi, normalizeApiError } from "../api"
+import { ApiError, BackendApi, normalizeApiError, setAuthToken } from "../api"
 
 interface AuthenticateServiceRequest {
     email: string,
@@ -17,7 +17,7 @@ export async function AuthenticateService({
             password
         })
 
-        if (response.status !== 201) {
+        if (response.status !== 200) {
             throw new ApiError({
                 message: "Falha ao autenticar. Tente novamente.",
                 status: response.status
@@ -30,6 +30,11 @@ export async function AuthenticateService({
                 code: response.data?.error?.code,
                 status: response.status
             })
+        }
+
+        const token = response.data?.data?.token
+        if (typeof token === "string" && token.length > 0) {
+            setAuthToken(token)
         }
     } catch (err) {
         throw normalizeApiError(err)

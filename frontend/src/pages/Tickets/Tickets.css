@@ -74,12 +74,12 @@
 }
 
 .filters-body {
-    padding: 18px;
+    padding: 14px 16px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     transition: max-height 220ms ease, opacity 200ms ease, transform 200ms ease;
-    max-height: 900px;
+    max-height: 720px;
     opacity: 1;
     transform: translateY(0);
 }
@@ -99,15 +99,15 @@
 
 .filters-row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
 }
 
 .filters-field {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    font-size: 0.9rem;
+    gap: 6px;
+    font-size: 0.88rem;
     color: #334155;
     font-weight: 600;
 }
@@ -116,8 +116,8 @@
 .filters-field select {
     border: 1px solid #e2e8f0;
     border-radius: 8px;
-    padding: 10px 12px;
-    font-size: 0.95rem;
+    padding: 8px 10px;
+    font-size: 0.92rem;
     font-family: inherit;
     background: #ffffff;
     color: #0f172a;
@@ -126,8 +126,8 @@
 .filters-group {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    font-size: 0.9rem;
+    gap: 8px;
+    font-size: 0.88rem;
     color: #334155;
     font-weight: 600;
 }
@@ -148,8 +148,14 @@
 .filters-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 12px;
+    gap: 10px;
     flex-wrap: wrap;
+}
+
+.filters-actions .btn-primary,
+.filters-actions .btn-secondary {
+    padding: 8px 12px;
+    font-size: 0.88rem;
 }
 
 .checkbox-wrapper-4 * {
@@ -164,7 +170,7 @@
 .checkbox-wrapper-4 .cbx {
     user-select: none;
     cursor: pointer;
-    padding: 6px 8px;
+    padding: 4px 6px;
     border-radius: 6px;
     overflow: hidden;
     transition: all 0.2s ease;
@@ -237,7 +243,8 @@
     stroke-dashoffset: 0;
 }
 
-.checkbox-wrapper-4 .inline-svg {
+.checkbox-wrapper-4 .inline-svg,
+.inline-svg {
     position: absolute;
     width: 0;
     height: 0;

@@ -1,5 +1,6 @@
 
 import env from "../env/config";
+import { logger } from "../logger";
 import app from "./app";
 
 export function startHttpServer() {
@@ -8,10 +9,10 @@ export function startHttpServer() {
         host: '0.0.0.0'
     }, (err, address) => {
         if (err) {
-            console.error(err)
+            logger.error('Error starting HTTP server', err)
             process.exit(1)
         }
 
-        console.log(`HTTP Server running on ${address}`)
+        logger.info(`HTTP Server running on ${address}`)
     })
 }

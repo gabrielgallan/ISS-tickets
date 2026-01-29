@@ -16,7 +16,9 @@ export default function Tickets() {
     searchValue: "",
     ticketStateIds: [],
     ticketPriorityIds: [],
-    ticketTypeIds: []
+    ticketTypeIds: [],
+    startDate: "",
+    endDate: ""
   })
   const [filtersCollapsed, setFiltersCollapsed] = useState(true)
   const [page, setPage] = useState(1)
@@ -27,7 +29,9 @@ export default function Tickets() {
     (filters.searchValue && filters.searchValue.trim().length > 0) ||
     filters.ticketStateIds.length > 0 ||
     filters.ticketPriorityIds.length > 0 ||
-    filters.ticketTypeIds.length > 0
+    filters.ticketTypeIds.length > 0 ||
+    filters.startDate ||
+    filters.endDate
 
   const ticketStatusOptions = [
     { id: 1, label: "Open", ids: [1, 4] },
@@ -92,7 +96,9 @@ export default function Tickets() {
         searchValue: filters.searchValue,
         ticketStateIds: filters.ticketStateIds,
         ticketPriorityIds: filters.ticketPriorityIds,
-        ticketTypeIds: filters.ticketTypeIds
+        ticketTypeIds: filters.ticketTypeIds,
+        startDate: filters.startDate && filters.endDate ? filters.startDate : undefined,
+        endDate: filters.startDate && filters.endDate ? filters.endDate : undefined
       })
 
       const nextTickets = res.data.tickets ?? []
@@ -139,7 +145,9 @@ export default function Tickets() {
       searchValue: "",
       ticketStateIds: [],
       ticketPriorityIds: [],
-      ticketTypeIds: []
+      ticketTypeIds: [],
+      startDate: "",
+      endDate: ""
     }
     setFilters(cleared)
     setPage(1)
@@ -232,6 +240,25 @@ export default function Tickets() {
               value={filters.searchValue}
               onChange={(event) => setFilters((prev) => ({ ...prev, searchValue: event.target.value }))}
               placeholder="Digite para buscar"
+            />
+          </label>
+        </div>
+
+        <div className="filters-row">
+          <label className="filters-field">
+            <span>Data inicial</span>
+            <input
+              type="date"
+              value={filters.startDate}
+              onChange={(event) => setFilters((prev) => ({ ...prev, startDate: event.target.value }))}
+            />
+          </label>
+          <label className="filters-field">
+            <span>Data final</span>
+            <input
+              type="date"
+              value={filters.endDate}
+              onChange={(event) => setFilters((prev) => ({ ...prev, endDate: event.target.value }))}
             />
           </label>
         </div>

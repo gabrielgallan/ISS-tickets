@@ -1,5 +1,6 @@
 import { AxiosError, AxiosInstance } from 'axios'
 import qs from 'qs'
+import dayjs from 'dayjs'
 
 import { IssGetTicketsResponseDTO } from '../../dto/get-tickets-response.dto'
 import { Ticket } from '@/core/model/ticket'
@@ -11,6 +12,7 @@ interface GetTicketsServiceRequest {
     searchField: TicketSearchFields
     searchValue: string
     filters: TicketFilters
+    timestamp?: Timestamp
     perPage: number
     page: number
 }
@@ -21,6 +23,11 @@ interface GetTicketsServiceResponse {
 }
 
 type TicketSearchFields = 'tn' | 'title' | 'a_body' | 'company' | 'customer_user_id' | 'login'
+
+interface Timestamp {
+    start: Date
+    end: Date
+}
 
 interface TicketFilters {
     ticketStateIds: number[]
@@ -37,6 +44,7 @@ export class GetTicketsService {
         searchField,
         searchValue,
         filters,
+        timestamp,
         perPage,
         page
     }: GetTicketsServiceRequest): Promise<GetTicketsServiceResponse> {
@@ -71,12 +79,22 @@ export class GetTicketsService {
 
             const rawResponse = apiResponse.data as IssGetTicketsResponseDTO
 
-            console.log(rawResponse.tickets.data)
-
             const tickets = rawResponse.tickets.data.map((ticket) => TicketsMapper.toEntity(ticket, rawResponse))
 
+            let ticketsBetweenTimestamp: Ticket[] | undefined = undefined
+
+            if (timestamp) {
+                ticketsBetweenTimestamp = tickets.filter((ticket) => {
+                    const ticketCreatedAtJS = dayjs(ticket.createdAtUtc)
+                    const startTimestampJS = dayjs(timestamp.start)
+                    const endTimestampJS = dayjs(timestamp.end)
+
+                    return ticketCreatedAtJS.isAfter(startTimestampJS) && ticketCreatedAtJS.isBefore(endTimestampJS)
+                })
+            }
+
             return {
-                tickets,
+                tickets: ticketsBetweenTimestamp ?? tickets,
                 rawResponse
             }
         } catch (err: any) {

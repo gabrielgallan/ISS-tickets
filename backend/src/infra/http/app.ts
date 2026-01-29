@@ -8,38 +8,32 @@ import { ZodError } from "zod";
 import env from "../env/config";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { error } from "node:console";
+import { logger } from "../logger";
+import fastifyJwt from "@fastify/jwt";
 
 const app = fastify()
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// app.register(fastifyCors, {
-//   origin: [
-//     `http://127.0.0.1:${env.PORT}`,
-//     `http://localhost:${env.PORT}`,
-//     'http://127.0.0.1:5173',
-//     'http://localhost:5173',
-//   ],
-//   methods: ['GET', 'POST'],
-//   credentials: true
-// })
+// -> Fastify Plugins
+app.register(fastifyCookie)
 
 app.register(fastifyStatic, {
-  root: path.join(__dirname, "../../frontend/dist"),
+  root: path.resolve('../frontend/dist'),
   prefix: "/",
 })
 
-app.register(fastifyCookie)
-
-app.setNotFoundHandler((req, reply) => {
-  if (req.url.startsWith('/api')) {
-    return reply.code(404).send({ message: 'Not Found' })
+app.register(fastifyJwt, {
+  secret: env.JWT_SECRET,
+  cookie: {
+      cookieName: 'refreshToken',
+      signed: false
+  },
+  sign: {
+      expiresIn: '1h',
   }
-
-  return reply.sendFile('index.html')
 })
 
+// -> API Routes
 app.register(async () => {
   app.register(sessionRoutes)
   app.register(ticketsRoutes)
@@ -47,14 +41,44 @@ app.register(async () => {
   prefix: 'api'
 })
 
-app.setErrorHandler((error, request, reply) => {
-    if (error instanceof ZodError) {
-        return reply.status(400)
-                    .send({ message: 'Data validation error!', issues: error.format() })
-    }
+// -> Not Found Handler
+app.setNotFoundHandler((req, reply) => {
+  if (req.url.startsWith('/api')) {
+    return reply.code(404).send({
+      success: false,
+      error: {
+        code: 'NOT_FOUND',
+        message: 'Not Found'
+      }
+    })
+  }
 
-    console.error(error)
-    return reply.status(500).send({ message: 'Internal Server Error' })
+  return reply.sendFile('index.html')
+})
+
+// -> Internal Error Handler Handler
+app.setErrorHandler((error, request, reply) => {
+  if (error instanceof ZodError) {
+    return reply.status(400)
+      .send({
+        success: false,
+        error: {
+          code: 'BAD_REQUEST',
+          message: 'Data validation error!',
+          issues: error.format()
+        }
+      })
+  }
+
+  logger.error(error)
+
+  return reply.status(500).send({
+    success: false,
+    error: {
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Internal Server Error'
+    }
+  })
 })
 
 export default app

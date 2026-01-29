@@ -2,15 +2,20 @@ import { PortalApi } from "@/core/iss-partner/services/authenticate/api/portal-a
 import { UnauthorizedMemberError } from "@/core/iss-partner/services/errors/unauthorized-member";
 import { GetTicketCustomerService } from "@/core/iss-partner/services/get-tickets-customers.ts/get-tickets-customers";
 import { GetTicketsService } from "@/core/iss-partner/services/get-tickets/get-tickets";
-import { SessionManager } from "@/infra/session/session-manager";
+import { SessionManager } from "@/infra/session/session";
 import env from "@/infra/env/config";
 import { FastifyReply, FastifyRequest } from "fastify";
 import z from "zod";
 import { mergeTicketsToCustomers } from "@/core/iss-partner/utils/merge-tickets-customers";
+import { makeSessionManager } from "@/infra/session/factories/make-session-manager";
+import { logger } from "@/infra/logger";
+import { NodeCryptoEncrypter } from "@/infra/encrypter/node-crypto/node-crypto-encrypter";
 
 export async function getTickets(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const sessionId = request.cookies.sessionId as string
+        const sessionKey = request.user.sign.key
+
+        const sessionManager = makeSessionManager()
 
         const querySchema = z.object({
             searchField: z.enum(['tn', 'title', 'a_body', 'company', 'customer_user_id', 'login']).default('tn'),
@@ -33,6 +38,8 @@ export async function getTickets(request: FastifyRequest, reply: FastifyReply) {
                     .transform(val =>
                         val ? val.split(',').map(v => Number(v)).filter(n => !isNaN(n)) : []
                     ),
+            startDate: z.coerce.date().optional(),
+            endDate: z.coerce.date().optional(),
             perPage: z.coerce.number().default(10),
             page: z.coerce.number().default(1),
         })
@@ -43,13 +50,19 @@ export async function getTickets(request: FastifyRequest, reply: FastifyReply) {
             ticketStateIds,
             ticketPriorityIds,
             ticketTypeIds,
+            startDate,
+            endDate,
             perPage, 
             page 
         } = querySchema.parse(request.query)
 
-        const { sessionCookieJar } = SessionManager.getSession(sessionId)
+        const session = await sessionManager.getSessionByKey(sessionKey)
 
-        const apiAuthenticated = await PortalApi.create(sessionCookieJar)
+        if (!session) {
+            return reply.status(401).send({ error: 'Unauthorized, session not found!' })
+        }
+
+        const apiAuthenticated = await PortalApi.create(session.jar)
 
         const { tickets } = await new GetTicketsService(apiAuthenticated).execute({
             searchField,
@@ -59,6 +72,10 @@ export async function getTickets(request: FastifyRequest, reply: FastifyReply) {
                 ticketPriorityIds,
                 ticketTypeIds
             },
+            timestamp: startDate && endDate ? {
+                start: startDate,
+                end: endDate
+            } : undefined,
             perPage,
             page
         })
