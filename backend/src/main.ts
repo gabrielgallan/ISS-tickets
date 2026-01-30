@@ -11,7 +11,8 @@ import { connectRedis } from "./infra/lib/redis"
 import { makeSessionManager } from "./infra/session/factories/make-session-manager"
 import env from "./infra/env/config"
 
-// connectRedis()
+connectRedis()
+
 logger.info('Node Environment:', env.NODE_ENV)
 startHttpServer()
 

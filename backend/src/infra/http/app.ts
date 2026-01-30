@@ -11,37 +11,46 @@ import path from "node:path";
 import { error } from "node:console";
 import { logger } from "../logger";
 import fastifyJwt from "@fastify/jwt";
+import { serverRoutes } from "./router/server";
 
 const app = fastify()
 
 // -> Fastify Plugins
-app.register(fastifyCookie)
+app.register(async () => {
+  await app.register(fastifyCors, {
+    origin: true,
+    credentials: true,
+  })
 
-app.register(fastifyStatic, {
-  root: path.resolve('../frontend/dist'),
-  prefix: "/",
-})
+  await app.register(fastifyCookie)
 
-app.register(fastifyJwt, {
-  secret: env.JWT_SECRET,
-  cookie: {
+  await app.register(fastifyJwt, {
+    secret: env.JWT_SECRET,
+    cookie: {
       cookieName: 'refreshToken',
       signed: false
-  },
-  sign: {
-      expiresIn: '1h',
-  }
+    }
+  })
 })
 
-// -> API Routes
+// => API Routes
+
+//  -> Frontend 
+// app.register(fastifyStatic, {
+//   root: path.resolve('../frontend/dist'),
+//   prefix: "/",
+// })
+
+//  -> Backend API 
 app.register(async () => {
+  app.register(serverRoutes)
   app.register(sessionRoutes)
   app.register(ticketsRoutes)
 }, {
   prefix: 'api'
 })
 
-// -> Not Found Handler
+// => Not Found Handler
 app.setNotFoundHandler((req, reply) => {
   if (req.url.startsWith('/api')) {
     return reply.code(404).send({
@@ -56,7 +65,7 @@ app.setNotFoundHandler((req, reply) => {
   return reply.sendFile('index.html')
 })
 
-// -> Internal Error Handler Handler
+// => Internal Error Handler Handler
 app.setErrorHandler((error, request, reply) => {
   if (error instanceof ZodError) {
     return reply.status(400)

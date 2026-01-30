@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 
-export async function health(
+export async function connection(
     request: FastifyRequest, 
     reply: FastifyReply
 ) {

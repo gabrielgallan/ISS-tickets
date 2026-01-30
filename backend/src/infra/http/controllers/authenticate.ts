@@ -5,96 +5,104 @@ import { InvalidPortalUrlError } from "@/core/iss-partner/services/errors/invali
 import { NodeCryptoEncrypter } from "@/infra/encrypter/node-crypto/node-crypto-encrypter";
 import env from "@/infra/env/config";
 import { makeSessionManager } from "@/infra/session/factories/make-session-manager";
-import { SessionManager } from "@/infra/session/session";
+import { Session, SessionManager } from "@/infra/session/session";
+import { getSessionFromRefreshToken } from "@/infra/utils/verify-session";
 import { FastifyReply, FastifyRequest } from "fastify";
 import z from "zod";
 
-export async function authenticate(request: FastifyRequest, reply: FastifyReply) {
-    const bodySchema = z.object({
-        email: z.string(),
-        password: z.string()
+export async function authenticate(
+  request: FastifyRequest,
+  reply: FastifyReply
+) {
+  const bodySchema = z.object({
+    email: z.string(),
+    password: z.string(),
+  })
+
+  const { email, password } = bodySchema.parse(request.body)
+
+  const sessionManager = makeSessionManager()
+
+  let session: Session
+
+  // 🔐 1. tenta reaproveitar sessão via refresh token
+  const existingSession = await getSessionFromRefreshToken(
+    request,
+    sessionManager
+  )
+
+  if (existingSession) {
+    session = existingSession
+  } else {
+    session = await sessionManager.createSession()
+  }
+
+  try {
+    // 🔐 2. autentica no portal usando a sessão correta
+    const { cookieJar } = await new AuthenticateMemberService(session.jar)
+      .execute({ email, password })
+
+    // 💾 3. salva sessão
+    await sessionManager.saveSession({
+      key: session.key,
+      jar: cookieJar,
     })
 
-    const { email, password } = bodySchema.parse(request.body)
+    // 🔑 4. gera tokens
+    const token = await reply.jwtSign(
+      { key: session.key },
+      { expiresIn: '1h' }
+    )
 
-    try {
-        const sessionManager = makeSessionManager()
-        
-        // -> Create
-        const session = await sessionManager.createSession()
+    const refreshToken = await reply.jwtSign(
+      { key: session.key },
+      { expiresIn: '7d' }
+    )
 
-        const { cookieJar } = await new AuthenticateMemberService(session.jar)
-            .execute(
-                {
-                    email,
-                    password
-                })
-
-        // -> Save
-        await sessionManager.saveSession({
-            key: session.key,
-            jar: cookieJar
-        })
-
-        const token = await reply.jwtSign(
-            {
-                sign: {
-                    key: session.key
-                }
-            }
-        )
-
-        const refreshToken = await reply.jwtSign(
-            {
-                sign: {
-                    key: session.key,
-                    expiresIn: '7d'
-                }
-            }
-        )
-
-        return reply
-            .setCookie('refreshToken', refreshToken, {
-                path: '/',
-                httpOnly: true,
-                secure: true,
-                sameSite: true
-            })
-            .status(200).send({
-                success: true,
-                data: {
-                    token
-                }
-            })
-    } catch (err: any) {
-        if (err instanceof InvalidCredentialsError) {
-            return reply.status(422).send({
-                success: false,
-                error: {
-                    code: 'INVALID_CREDENTIALS',
-                    message: err.message
-                }
-            })
-        }
-        if (err instanceof InvalidPortalUrlError) {
-            return reply.status(500).send({
-                success: false,
-                error: {
-                    code: 'INVALID_PORTAL_URL',
-                    message: err.message
-                }
-            })
-        }
-        if (err instanceof InternalServerError) {
-            return reply.status(500).send({
-                success: false,
-                error: {
-                    code: 'INTERNAL_SERVER_ERROR',
-                    message: err.message
-                }
-            })
-        }
-
-        throw err
+    // 🍪 5. responde
+    return reply
+      .setCookie('refreshToken', refreshToken, {
+        path: '/',
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+      })
+      .status(200)
+      .send({
+        success: true,
+        data: { token },
+      })
+  } catch (err) {
+    if (err instanceof InvalidCredentialsError) {
+      return reply.status(422).send({
+        success: false,
+        error: {
+          code: 'INVALID_CREDENTIALS',
+          message: err.message,
+        },
+      })
     }
+
+    if (err instanceof InvalidPortalUrlError) {
+      return reply.status(500).send({
+        success: false,
+        error: {
+          code: 'INVALID_PORTAL_URL',
+          message: err.message,
+        },
+      })
+    }
+
+    if (err instanceof InternalServerError) {
+      return reply.status(500).send({
+        success: false,
+        error: {
+          code: 'INTERNAL_SERVER_ERROR',
+          message: err.message,
+        },
+      })
+    }
+
+    throw err
+  }
 }

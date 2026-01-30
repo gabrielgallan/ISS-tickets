@@ -13,7 +13,7 @@ import { NodeCryptoEncrypter } from "@/infra/encrypter/node-crypto/node-crypto-e
 
 export async function getTickets(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const sessionKey = request.user.sign.key
+        const sessionKey = request.user.key
 
         const sessionManager = makeSessionManager()
 

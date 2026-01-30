@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  api:
+    build: .
+    ports:
+      - "8090:8090"
+    depends_on:
+      - redis
+    environment:
+      PORT: 8090
+      NODE_ENV: production
+      REDIS_URL: redis://redis:6379
+      ISS_PORTAL_URL: ${ISS_PORTAL_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      CRYPTO_KEY: ${CRYPTO_KEY}
+    restart: unless-stopped
+
+  redis:
+    image: redis:7
+    volumes:
+      - redis_data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+    restart: unless-stopped
+
+volumes:
+  redis_data:

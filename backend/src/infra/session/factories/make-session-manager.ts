@@ -6,6 +6,6 @@ import { RedisSessionsRepository } from "@/infra/repositories/redis/redis-sessio
 export function makeSessionManager() {
     return new SessionManager(
         new NodeCryptoEncrypter(),
-        inMemorySessionsRepository
+        new RedisSessionsRepository()
     )
 }

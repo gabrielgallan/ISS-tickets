@@ -7,12 +7,12 @@ export async function refresh(request: FastifyRequest, reply: FastifyReply) {
     try {
         await request.jwtVerify({ onlyCookie: true })
     } catch (err) {
-        return reply.status(401).send({ error: 'Unauthorized, session expired!' })
+        return reply.status(401).send({ error: 'Unauthorized, JWT expired!' })
     }
 
-    const { key } = request.user.sign
-
     const sessionManager = makeSessionManager()
+
+    const { key } = request.user
 
     const session = await sessionManager.getSessionByKey(key)
 
@@ -21,33 +21,25 @@ export async function refresh(request: FastifyRequest, reply: FastifyReply) {
     }
 
     const token = await reply.jwtSign(
-        {
-            sign: {
-                key: session.key
-            }
-        }
+      { key, },
+      { expiresIn: '1h' }
     )
 
     const refreshToken = await reply.jwtSign(
-        {
-            sign: {
-                key: session.key,
-                expiresIn: '7d'
-            }
-        }
+      { key, },
+      { expiresIn: '7d' }
     )
 
     return reply
-        .setCookie('refreshToken', refreshToken, {
-            path: '/',
-            httpOnly: true,
-            secure: true,
-            sameSite: true
-        })
-        .status(200).send({
-            success: true,
-            data: {
-                token
-            }
-        })
+      .setCookie('refreshToken', refreshToken, {
+        path: '/',
+        httpOnly: true,
+        secure: false,
+        sameSite: 'lax',
+      })
+      .status(200)
+      .send({
+        success: true,
+        data: { token },
+      })
 }

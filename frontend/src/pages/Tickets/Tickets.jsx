@@ -89,6 +89,10 @@ export default function Tickets() {
     setError("")
 
     try {
+      const hasDateRange = Boolean(filters.startDate && filters.endDate)
+      const startTimestamp = hasDateRange ? new Date(filters.startDate).toISOString() : undefined
+      const endTimestamp = hasDateRange ? new Date(filters.endDate).toISOString() : undefined
+
       const res = await GetTicketsService({
         perPage: perPageNumber,
         page: pageNumber,
@@ -97,8 +101,8 @@ export default function Tickets() {
         ticketStateIds: filters.ticketStateIds,
         ticketPriorityIds: filters.ticketPriorityIds,
         ticketTypeIds: filters.ticketTypeIds,
-        startDate: filters.startDate && filters.endDate ? filters.startDate : undefined,
-        endDate: filters.startDate && filters.endDate ? filters.endDate : undefined
+        startDate: startTimestamp,
+        endDate: endTimestamp
       })
 
       const nextTickets = res.data.tickets ?? []
@@ -248,7 +252,7 @@ export default function Tickets() {
           <label className="filters-field">
             <span>Data inicial</span>
             <input
-              type="date"
+              type="datetime-local"
               value={filters.startDate}
               onChange={(event) => setFilters((prev) => ({ ...prev, startDate: event.target.value }))}
             />
@@ -256,7 +260,7 @@ export default function Tickets() {
           <label className="filters-field">
             <span>Data final</span>
             <input
-              type="date"
+              type="datetime-local"
               value={filters.endDate}
               onChange={(event) => setFilters((prev) => ({ ...prev, endDate: event.target.value }))}
             />
